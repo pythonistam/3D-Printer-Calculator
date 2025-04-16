@@ -16,14 +16,14 @@ class CostCalculator(QWidget):
         self.inputs = {}
 
         fields = [
-            ("Цена пластика (Драм/кг)", "plastic_price", "10000"),
-            ("Вес детали (г)", "part_weight", ""),
-            ("Вес поддержек (г)", "support_weight", ""),
-            ("Время печати (ч)", "print_time", ""),
-            ("Цена за 1 кВт⋅ч (Драм)", "energy_price", "60"),
-            ("Мощность принтера (кВт)", "printer_power", "0.5"),
-            ("Износ принтера (Драм/ч)", "printer_wear", "200"),
-            ("Моделирование (Драм)", "modeling_cost", "2000"),
+            ("Цена пластика (Драм/кг)", "plastic_price", "0"),
+            ("Вес детали (г)", "part_weight", "0"),
+            ("Вес поддержек (г)", "support_weight", "0"),
+            ("Время печати (ч)", "print_time", "0"),
+            ("Цена за 1 кВт⋅ч (Драм)", "energy_price", "0"),
+            ("Мощность принтера (кВт)", "printer_power", "0"),
+            ("Износ принтера (Драм/ч)", "printer_wear", "0"),
+            ("Моделирование (Драм)", "modeling_cost", "0"),
         ]
 
         for label_text, key, default_value in fields:

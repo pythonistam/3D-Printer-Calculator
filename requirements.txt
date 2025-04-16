@@ -1,0 +1,14 @@
+certifi==2025.1.31
+charset-normalizer==3.4.1
+click==8.1.8
+colorama==0.4.6
+idna==3.10
+packaging==24.2
+python-dotenv==1.0.1
+requests==2.32.3
+six==1.17.0
+spark-parser==1.8.9
+uncompyle6==3.9.2
+urllib3==2.3.0
+webdriver-manager==4.0.2
+xdis==6.1.3
