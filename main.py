@@ -15,6 +15,7 @@ DEFAULT_CONFIG = {
     "print_time": 0.0,
     "modeling_cost": 0.0,
     "quantity": 1,
+    "batch_size": 10,
     "energy_price": 50.0,
     "printer_power": 0.3,
     "printer_wear": 20.0
@@ -103,12 +104,18 @@ QLabel#result_title {
 
 QLabel#total_result_val {
     color: #4fc1ff;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: bold;
 }
 
 QLabel#part_result_val {
     color: #9cdcfe;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+QLabel#batch_result_val {
+    color: #a7dbff;
     font-size: 14px;
     font-weight: bold;
 }
@@ -160,7 +167,7 @@ class CostCalculator(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Калькулятор стоимости 3D-печати")
-        self.setFixedSize(360, 480)
+        self.setFixedSize(360, 520)
         self.config = load_config()
         self.init_ui()
 
@@ -192,7 +199,8 @@ class CostCalculator(QWidget):
             ("Вес поддержек (г):", "support_weight"),
             ("Время печати (ч):", "print_time"),
             ("Моделирование (Драм):", "modeling_cost"),
-            ("Количество деталей (шт):", "quantity"),
+            ("Количество в расчете (шт):", "quantity"),
+            ("Размер партии (шт):", "batch_size"),
         ]
         
         for label_text, key in calc_fields:
@@ -225,6 +233,10 @@ class CostCalculator(QWidget):
         self.part_result_label = QLabel("Стоимость за 1 шт: 0.00 Драм.")
         self.part_result_label.setObjectName("part_result_val")
         result_layout.addWidget(self.part_result_label)
+
+        self.batch_result_label = QLabel("Стоимость партии: 0.00 Драм.")
+        self.batch_result_label.setObjectName("batch_result_val")
+        result_layout.addWidget(self.batch_result_label)
         
         calc_layout.addWidget(self.result_box)
         self.calc_tab.setLayout(calc_layout)
@@ -275,38 +287,42 @@ class CostCalculator(QWidget):
             print_time = float(self.inputs["print_time"].text())
             modeling_cost = float(self.inputs["modeling_cost"].text())
             quantity = int(self.inputs["quantity"].text())
+            batch_size = int(self.inputs["batch_size"].text())
 
             energy_price = float(self.inputs["energy_price"].text())
             printer_power = float(self.inputs["printer_power"].text())
             printer_wear = float(self.inputs["printer_wear"].text())
 
-            if quantity <= 0:
-                raise ValueError("Количество должно быть больше нуля.")
+            if quantity <= 0 or batch_size <= 0:
+                raise ValueError("Количество деталей и размер партии должны быть больше нуля.")
 
             # Calculations
             material_cost = (part_weight + support_weight) / 1000 * plastic_price
             energy_cost = print_time * printer_power * energy_price
             wear_cost = print_time * printer_wear
             total_cost = material_cost + energy_cost + wear_cost + modeling_cost
+            
             part_cost = total_cost / quantity
+            batch_cost = part_cost * batch_size
 
             # Update results
-            self.total_result_label.setText(f"Итоговая стоимость: {total_cost:.2f} Драм.")
+            self.total_result_label.setText(f"Итоговая стоимость ({quantity} шт): {total_cost:.2f} Драм.")
             self.part_result_label.setText(f"Стоимость за 1 шт: {part_cost:.2f} Драм.")
+            self.batch_result_label.setText(f"Стоимость партии ({batch_size} шт): {batch_cost:.2f} Драм.")
 
             self.save_current_state_to_config()
         except ValueError:
             QMessageBox.warning(
                 self, 
                 "Ошибка", 
-                "Пожалуйста, заполните все поля корректными числами.\nКоличество деталей должно быть целым числом больше 0."
+                "Пожалуйста, заполните все поля корректными числами.\nКоличество и размер партии должны быть целыми числами больше 0."
             )
 
     def save_current_state_to_config(self):
         for key in self.inputs:
             try:
                 val_str = self.inputs[key].text()
-                if key == "quantity":
+                if key in ["quantity", "batch_size"]:
                     self.config[key] = int(val_str)
                 else:
                     self.config[key] = float(val_str)
@@ -326,10 +342,10 @@ class CostCalculator(QWidget):
             self.config["printer_wear"] = printer_wear
             
             # Save any valid calculation inputs too
-            for key in ["plastic_price", "part_weight", "support_weight", "print_time", "modeling_cost", "quantity"]:
+            for key in ["plastic_price", "part_weight", "support_weight", "print_time", "modeling_cost", "quantity", "batch_size"]:
                 try:
                     val_str = self.inputs[key].text()
-                    if key == "quantity":
+                    if key in ["quantity", "batch_size"]:
                         self.config[key] = int(val_str)
                     else:
                         self.config[key] = float(val_str)
