@@ -167,7 +167,7 @@ class CostCalculator(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Калькулятор стоимости 3D-печати")
-        self.setFixedSize(360, 520)
+        self.setFixedSize(600, 520)
         self.config = load_config()
         self.init_ui()
 
@@ -199,8 +199,8 @@ class CostCalculator(QWidget):
             ("Вес поддержек (г):", "support_weight"),
             ("Время печати (ч):", "print_time"),
             ("Моделирование (Драм):", "modeling_cost"),
-            ("Количество в расчете (шт):", "quantity"),
-            ("Размер партии (шт):", "batch_size"),
+            ("Количество в партии (шт):", "quantity"),
+            ("Количество партий (шт):", "batch_size"),
         ]
         
         for label_text, key in calc_fields:
@@ -227,7 +227,7 @@ class CostCalculator(QWidget):
         self.result_title.setObjectName("result_title")
         result_layout.addWidget(self.result_title)
         
-        self.total_result_label = QLabel("Итоговая стоимость: 0.00 Драм.")
+        self.total_result_label = QLabel("Стоимость 1 партии: 0.00 Драм.")
         self.total_result_label.setObjectName("total_result_val")
         result_layout.addWidget(self.total_result_label)
         
@@ -235,7 +235,7 @@ class CostCalculator(QWidget):
         self.part_result_label.setObjectName("part_result_val")
         result_layout.addWidget(self.part_result_label)
 
-        self.batch_result_label = QLabel("Стоимость партии: 0.00 Драм.")
+        self.batch_result_label = QLabel("Стоимость заказа: 0.00 Драм.")
         self.batch_result_label.setObjectName("batch_result_val")
         result_layout.addWidget(self.batch_result_label)
         
@@ -298,19 +298,19 @@ class CostCalculator(QWidget):
             if quantity <= 0 or batch_size <= 0:
                 raise ValueError("Количество деталей и размер партии должны быть больше нуля.")
 
-            # Calculations
+            # Calculations (inputs represent 1 batch)
             material_cost = (part_weight + support_weight) / 1000 * plastic_price
             energy_cost = print_time * printer_power * energy_price
             wear_cost = print_time * printer_wear
             total_cost = material_cost + energy_cost + wear_cost + modeling_cost
             
             part_cost = total_cost / quantity
-            batch_cost = part_cost * batch_size
+            batch_cost = total_cost * batch_size
 
             # Update results
-            self.total_result_label.setText(f"Итоговая стоимость ({quantity} шт): {total_cost:.2f} Драм.")
+            self.total_result_label.setText(f"Стоимость 1 партии ({quantity} шт): {total_cost:.2f} Драм.")
             self.part_result_label.setText(f"Стоимость за 1 шт: {part_cost:.2f} Драм.")
-            self.batch_result_label.setText(f"Стоимость партии ({batch_size} шт): {batch_cost:.2f} Драм.")
+            self.batch_result_label.setText(f"Стоимость заказа ({batch_size} парт. / {batch_size * quantity} шт): {batch_cost:.2f} Драм.")
 
             self.save_current_state_to_config()
         except ValueError:
