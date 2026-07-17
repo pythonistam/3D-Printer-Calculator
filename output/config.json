@@ -1,0 +1,11 @@
+{
+    "plastic_price": 10000.0,
+    "part_weight": 0.0,
+    "support_weight": 0.0,
+    "print_time": 0.0,
+    "modeling_cost": 0.0,
+    "quantity": 1,
+    "energy_price": 50.0,
+    "printer_power": 0.3,
+    "printer_wear": 20.0
+}
