@@ -206,6 +206,7 @@ class CostCalculator(QWidget):
         for label_text, key in calc_fields:
             line_edit = QLineEdit()
             line_edit.setText(str(self.config.get(key, DEFAULT_CONFIG[key])))
+            line_edit.editingFinished.connect(self.save_current_state_to_config)
             self.inputs[key] = line_edit
             calc_form.addRow(label_text, line_edit)
             
@@ -260,6 +261,7 @@ class CostCalculator(QWidget):
         for label_text, key in settings_fields:
             line_edit = QLineEdit()
             line_edit.setText(str(self.config.get(key, DEFAULT_CONFIG[key])))
+            line_edit.editingFinished.connect(self.save_current_state_to_config)
             self.inputs[key] = line_edit
             settings_form.addRow(label_text, line_edit)
             
